@@ -43,6 +43,67 @@ samai = pd.Series(result)
 dfm.loc[:,'difference'] = samai
 comp = dfm.iloc[:,1:8]
 
+#2/1quatoro daicount judge tonanor156 2/2 la328+2 ktaka 399+1
+#dailist series to df
+#len(df)q=282
+if len(comp) == 282: #Q
+	posdai = comp.loc[:,'dai'].unique()
+	comp.insert(0,'posdai',posdai)
+	dailist = pd.read_csv('./dailist/quatorodailist.csv',names=('posdai','kuu'))
+	comp = pd.merge(comp, dailist, how='outer')
+	comp = comp.reindex(columns=['posdai','Rotation','BB','RB','difference','max','machine'])
+	comp = comp.fillna(0)
+	comp = comp.astype({'posdai': 'int64','Rotation':'int64','BB':'int64','RB':'int64','difference':'int64','max':'int64','machine':'str'})
+	comp = comp.sort_values('posdai')
+	print("Q_")
+elif len(comp) == 156: #tonanor
+	print("tonanor_ok")
+elif len(comp) == 328: #la
+	posdai = comp.loc[:,'dai'].unique()
+	comp.insert(0,'posdai',posdai)
+	dailist = pd.read_csv('./dailist/ladailist.csv',names=('posdai','kuu'))
+	comp = pd.merge(comp, dailist, how='outer')
+	comp = comp.reindex(columns=['posdai','Rotation','BB','RB','difference','max','machine'])
+	comp = comp.fillna(0)
+	comp = comp.astype({'posdai': 'int64','Rotation':'int64','BB':'int64','RB':'int64','difference':'int64','max':'int64','machine':'str'})
+	comp = comp.sort_values('posdai')
+	print("la_2daiplus")
+elif len(comp) == 399: #ktaka
+	posdai = comp.loc[:,'dai'].unique()
+	comp.insert(0,'posdai',posdai)
+	dailist = pd.read_csv('./dailist/ktakadailist.csv',names=('posdai','kuu'))
+	comp = pd.merge(comp, dailist, how='outer')
+	comp = comp.reindex(columns=['posdai','Rotation','BB','RB','difference','max','machine'])
+	comp = comp.fillna(0)
+	comp = comp.astype({'posdai': 'int64','Rotation':'int64','BB':'int64','RB':'int64','difference':'int64','max':'int64','machine':'str'})
+	comp = comp.sort_values('posdai')
+	print("ktaka_1daiplus")
+else:
+	print("no missing dai")
+
+#1/30auto seriesmachine bank
+#pd.Series.unique()
+defdai = comp.loc[:,'machine'].unique()
+
+#series to df
+defdaidf = pd.DataFrame(defdai)
+defdaidf.insert(0,'namebank', defdai)
+dainame = pd.read_csv('namebank.csv',names=('namebank','neoname'))
+#drop_duplicates(subset=['namebank']
+dainame = dainame.drop_duplicates(subset=['namebank'])
+newdailist = pd.merge(defdaidf, dainame, how='outer')
+newdailist = newdailist.reindex(columns=['namebank','neoname'])
+newdailist.to_csv('./namebank.csv', header=False, index=False)
+
+
+#1/30,name.txt to String conversion
+dainame = pd.read_csv('namebank.csv', header=None)
+#tolist
+machinename = (dainame.iloc[:,0]).values.tolist()
+newname = (dainame.iloc[:,1]).values.tolist()
+#replace
+comp = comp.replace(machinename,newname)
+
 now = datetime.datetime.now()
 strdate = now.strftime('%m:%d %H:%M:%S')
 comp.to_csv(f'../{strdate}.csv', header=False, index=False)

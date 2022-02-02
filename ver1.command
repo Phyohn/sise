@@ -19,13 +19,13 @@ if [ $daisuu -eq 200 ]; then
 elif [ $daisuu -eq 303 ]; then
 	echo "o-ku"
 	mv $newcsv ../o-kura.csv
-elif [ $daisuu -eq 400 ]; then
+elif [ $daisuu -eq 399 ]; then
 	echo "KEIX"
 	mv $newcsv ../ktakaoka.csv
 elif [ $daisuu -eq 280 ]; then
 	echo "taiyo"
 	mv $newcsv ../taiyotakaoka.csv
-elif [ $daisuu -eq 330 ]; then
+elif [ $daisuu -eq 328 ]; then
 	echo "la"
 	mv $newcsv ../lapark.csv
 elif [ $daisuu -eq 324 ]; then
@@ -43,7 +43,7 @@ elif [ $daisuu -eq 156 ]; then
 elif [ $daisuu -eq 212 ]; then
 	echo "tonasupa"
 	mv $newcsv ../tonasupa.csv
-elif [ $daisuu -eq 297 ]; then
+elif [ $daisuu -eq 282 ]; then
 	echo "Q"
 	mv $newcsv ../quatoro.csv
 else
