@@ -11,41 +11,41 @@ grep -A 5 -B 80 '\"size\"\:\s[2-5][0-9]\{3\}\,' new.txt |tr -d ' \n'|sed -E 's/n
 
 python ver1.py
 
-newcsv=$(ls -1t ../*.csv | head -1)
+newcsv=$(ls -1t /Users/mac2018/Applications/Collection/linkdata/*.csv | head -1)
 
 if [ $daisuu -eq 200 ]; then
 	echo "inter"
-	mv $newcsv ../inter.csv
-elif [ $daisuu -eq 303 ]; then
+	mv $newcsv /Users/mac2018/Applications/Collection/linkdata/inter.csv
+elif [ $daisuu -eq 259 ]; then
 	echo "o-ku"
-	mv $newcsv ../o-kura.csv
+	mv $newcsv /Users/mac2018/Applications/Collection/linkdata/o-kura.csv
 elif [ $daisuu -eq 399 ]; then
 	echo "KEIX"
-	mv $newcsv ../ktakaoka.csv
+	mv $newcsv /Users/mac2018/Applications/Collection/linkdata/ktakaoka.csv
 elif [ $daisuu -eq 280 ]; then
 	echo "taiyo"
-	mv $newcsv ../taiyotakaoka.csv
+	mv $newcsv /Users/mac2018/Applications/Collection/linkdata/taiyotakaoka.csv
 elif [ $daisuu -eq 328 ]; then
 	echo "la"
-	mv $newcsv ../lapark.csv
+	mv $newcsv /Users/mac2018/Applications/Collection/linkdata/lapark.csv
 elif [ $daisuu -eq 324 ]; then
 	echo "kake"
-	mv $newcsv ../kakeo.csv
+	mv $newcsv /Users/mac2018/Applications/Collection/linkdata/kakeo.csv
 elif [ $daisuu -eq 225 ]; then
 	echo "hi"
-	mv $newcsv ../himi.csv
+	mv $newcsv /Users/mac2018/Applications/Collection/linkdata/himi.csv
 elif [ $daisuu -eq 192 ]; then
 	echo "yo"
-	mv $newcsv ../yosi.csv
+	mv $newcsv /Users/mac2018/Applications/Collection/linkdata/yosi.csv
 elif [ $daisuu -eq 156 ]; then
 	echo "tonanor"
-	mv $newcsv ../tonaminorth.csv
+	mv $newcsv /Users/mac2018/Applications/Collection/linkdata/tonaminorth.csv
 elif [ $daisuu -eq 212 ]; then
 	echo "tonasupa"
-	mv $newcsv ../tonasupa.csv
+	mv $newcsv /Users/mac2018/Applications/Collection/linkdata/tonasupa.csv
 elif [ $daisuu -eq 282 ]; then
 	echo "Q"
-	mv $newcsv ../quatoro.csv
+	mv $newcsv /Users/mac2018/Applications/Collection/linkdata/quatoro.csv
 else
 	echo "error!"
 fi
