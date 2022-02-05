@@ -43,7 +43,7 @@ samai = pd.Series(result)
 dfm.loc[:,'difference'] = samai
 comp = dfm.iloc[:,1:8]
 
-#2/1quatoro daicount judge tonanor156 2/2 la328+2 ktaka 399+1
+#2/1quatoro daicount judge tonanor156 2/2 la328+2 ktaka 399+1 o-kura 259+44
 #dailist series to df
 #len(df)q=282
 if len(comp) == 282: #Q
@@ -78,6 +78,16 @@ elif len(comp) == 399: #ktaka
 	comp = comp.astype({'posdai': 'int64','Rotation':'int64','BB':'int64','RB':'int64','difference':'int64','max':'int64','machine':'str'})
 	comp = comp.sort_values('posdai')
 	print("ktaka_1daiplus")
+elif len(comp) == 259: #o-kura
+	posdai = comp.loc[:,'dai'].unique()
+	comp.insert(0,'posdai',posdai)
+	dailist = pd.read_csv('./dailist/o-kuradailist.csv',names=('posdai','kuu'))
+	comp = pd.merge(comp, dailist, how='outer')
+	comp = comp.reindex(columns=['posdai','Rotation','BB','RB','difference','max','machine'])
+	comp = comp.fillna(0)
+	comp = comp.astype({'posdai': 'int64','Rotation':'int64','BB':'int64','RB':'int64','difference':'int64','max':'int64','machine':'str'})
+	comp = comp.sort_values('posdai')
+	print("o-ku_44daiplus")
 else:
 	print("no missing dai")
 
@@ -106,7 +116,7 @@ comp = comp.replace(machinename,newname)
 
 now = datetime.datetime.now()
 strdate = now.strftime('%m:%d %H:%M:%S')
-comp.to_csv(f'../{strdate}.csv', header=False, index=False)
+comp.to_csv(f'/Users/mac2018/Applications/Collection/linkdata/{strdate}.csv', header=False, index=False)
 
 if (comp.isnull().values.sum() != 0):
 	print ("Missing value")
