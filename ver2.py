@@ -42,12 +42,28 @@ def diff_num(s):
 def csv_stdout(df_c):
 	return df_c.to_csv(sys.stdout)
 
-TOP_DIR = os.path.dirname(__file__)
+top_d = "/Users/mac2018/Applications/Collection/sise/tmp/"
+#TOP_DIR = os.path.dirname(__file__)
+TOP_DIR = os.path.dirname(top_d)
 LIST_DIR = os.path.join(TOP_DIR, 'dailist/')
 ZERO_IMG = os.path.join(TOP_DIR, 'graph.png')
 
+#holl stock
+inter_ls = ('pmc=26036001', 200, 'inter')
+o_kura_ls = ('pmc=17008002', 259, 'o_kura')
+#pmc=21018018 ktakaoka
+#pmc=18001006 taiyo
+#pmc=21018015 lapark
+#pmc=16006037 kakeo
+#pmc=16006008 himi
+#pmc=16006002 yosi
+#pmc=16006020 tonanor
+#pmc=26036006 tonasupa
+#pmc=18007010 quatoro
 
-main_df = pd.read_csv('datapy.txt',names=('eigenvalue','dai','Rotation','BB','RB','difference','max','model'))
+
+
+main_df = pd.read_csv('datapy.txt',names=('eigenvalue','dai','Rotation','BB','RB','difference','max','model','hollcode'))
 slump_df = pd.read_csv('py.txt',names=('eigenvalue','base64'))
 dfm = pd.merge(main_df, slump_df)
 diff_num_base64 = dfm['base64'].values
@@ -60,6 +76,10 @@ for (s) in diff_num_base64:
 
 dfm['difference'] = diff_num_list
 comp = dfm.drop(columns = ['base64','eigenvalue'])
+
+#hollname_list
+hollname_list = comp['hollcode'].drop_duplicates().tolist()
+
 
 #2/1quatoro daicount judge tonanor156 2/2 la328+2 ktaka 399+1 o-kura 259+44
 #dailist series to df
@@ -89,7 +109,7 @@ def holl_judge(c):
 	elif len(c) == 297:
 		return "quatoro"
 '''
-
+'''
 if  len(comp) == 282: #Q
 	list_df = pd.read_csv('./dailist/quatorodailist.csv',names=('dai','hoge'))
 	merged_df = pd.merge(comp,list_df, on='dai' ,how='outer').drop( columns = 'hoge')
@@ -146,6 +166,7 @@ else:
 #newdailist = pd.merge(defdaidf, dainame, how='outer')
 #newdailist = newdailist.reindex(columns=['namebank','neoname'])
 #newdailist.to_csv('./namebank.csv', header=False, index=False)
+'''
 
 
 #auto model_name_bank
@@ -156,7 +177,6 @@ merged_model_name_df = pd.merge(model_name_df, rename_list_df , how='outer').dro
 sorted_model_df = merged_model_name_df.sort_values('renamed_model_name', na_position='first')
 sorted_model_df.to_csv('./namebank.csv', header=False, index=False)
 empty_value = (sorted_model_df['renamed_model_name'].isnull())
-
 '''
 if empty_value.sum() > 0 :
 	print("new model arrive")
@@ -199,9 +219,9 @@ if empty_value.sum() > 0 :
 	sorted_model_df = added_sorted_model_df.sort_values('renamed_model_name', na_position='first')
 else:
 	pass
-
 print("all model name has arrived")
 sorted_model_df.to_csv('./namebank.csv', header=False, index=False)
+
 
 #rename
 dailist_df=  pd.read_csv('namebank.csv', header=None)
@@ -211,11 +231,9 @@ comp = comp.replace(longname_list,shortname_list)
 
 
 #datetime to date
-
 today = datetime.datetime.now()
 intdt= int(today.strftime('%Y%m%d'))
 print(f'datetime is{intdt}?')
-
 if __name__ == '__main__':
 	if yes_no_input():
 		d = datetime.datetime.now()
@@ -226,6 +244,60 @@ intdt= int(d.strftime('%Y%m%d'))
 print(intdt)
 comp['date'] = intdt
 
+
+#hollname sequence
+'''
+print(comp)
+inter = (comp[comp['hollcode'] == 'pmc=26036001']).sort_values('dai')
+
+if  len(inter) == 200: #inter
+	inter_st = inter.drop(columns=['hollcode'])
+	inter_st.to_csv(f'/Users/mac2018/Applications/Collection/linkdata/inter.csv', header=False, index=False)
+else:
+	inter.insert(0,'dai_num_check',inter.loc[:,'dai'])
+	dai_num_check_df = pd.read_csv('./dailist/interdailist.csv',names=('dai_num_check','empty'),dtype="int64")
+	inter_outer_merged_df = pd.merge(inter, dai_num_check_df, how='outer')
+	inter_inner_merged_df = pd.merge(inter_outer_merged_df, dai_num_check_df, how='inner')
+	inter_inner_merged_df = inter_inner_merged_df.drop(columns=['hollcode','dai_num_check','empty'])
+	fillnaed_df = inter_inner_merged_df.fillna(0)
+	int_df = fillnaed_df.astype({'dai': 'int64','Rotation':'int64','BB':'int64','RB':'int64','difference':'int64','max':'int64','model':'str','date':'int64'})
+	inter_re = int_df.drop_duplicates(subset=['dai']).sort_values('dai')
+	inter_re.to_csv(f'/Users/mac2018/Applications/Collection/linkdata/inter.csv', header=False, index=False)
+'''
+def test(str1, int, str2):
+	test_df =  (comp[comp['hollcode'] == str1]).sort_values('dai')
+	if  len(test_df) == int:
+		test_df_st = test_df.drop(columns=['hollcode'])
+		test_df_st.to_csv(f'/Users/mac2018/Applications/Collection/linkdata/{str2}.csv', header=False, index=False)
+	else:
+		test_df.insert(0,'dai_num_check',inter.loc[:,'dai']) 
+		dai_num_check_df = pd.read_csv(f'./dailist/{str2}dailist.csv',names=('dai_num_check','empty'),dtype="int64")
+		outer_merged_df = pd.merge(test_df, dai_num_check_df, how='outer')
+		merged_df = pd.merge(outer_merged_df, dai_num_check_df, how='inner')
+		droped_df = merged_df.drop(columns=['hollcode','dai_num_check','empty'])
+		fillnaed_df = droped_df.fillna(0)
+		int_df = fillnaed_df.astype({'dai': 'int64','Rotation':'int64','BB':'int64','RB':'int64','difference':'int64','max':'int64','model':'str','date':'int64'})
+		test_df_re = int_df.drop_duplicates(subset=['dai']).sort_values('dai')
+		test_df_re.to_csv(f'/Users/mac2018/Applications/Collection/linkdata/{str2}.csv', header=False, index=False)
+
+#loop hollname_list
+for holl in hollname_list :
+	if holl == 'pmc=26036001':
+		test(*inter_ls)
+	elif holl == 'pmc=17008002':
+		test(*o_kura_ls)
+	else:
+		pass
+
+#*tuple open
+#test(*inter_ls)
+#test(*o_kura_ls)
+
+
+
+
+'''
+#output 
 now = datetime.datetime.now()
 strdate = now.strftime('%m:%d %H:%M:%S')
 comp.to_csv(f'/Users/mac2018/Applications/Collection/linkdata/{strdate}.csv', header=False, index=False)
@@ -238,4 +310,5 @@ if (comp.isnull().values.sum() != 0):
 else:
 	print ("OK")
 	print (comp.shape)
+'''
 quit()
