@@ -12,6 +12,8 @@ import platform
 from PIL import Image
 import sys
 import time
+import readline
+
 
 def yes_no_input():
 	while True:
@@ -37,7 +39,11 @@ def diff_num(s):
 			return (np.int64(0))
 		else:
 			l_diff = list(zip(*np.where( im_diff > 60 )))
-			return ((94 - (l_diff[0][1]))*53)
+			try:
+				return ((94 - (l_diff[0][1]))*53)
+			except IndexError as e:
+				return(00)
+				print("IndexError")
 
 def csv_stdout(df_c):
 	return df_c.to_csv(sys.stdout)
@@ -50,16 +56,16 @@ ZERO_IMG = os.path.join(TOP_DIR, 'graph.png')
 
 #holl stock
 inter_ls = ('pmc=26036001', 200, 'inter')
-o_kura_ls = ('pmc=17008002', 259, 'o_kura')
-#pmc=21018018 ktakaoka
-#pmc=18001006 taiyo
-#pmc=21018015 lapark
-#pmc=16006037 kakeo
-#pmc=16006008 himi
-#pmc=16006002 yosi
-#pmc=16006020 tonanor
-#pmc=26036006 tonasupa
-#pmc=18007010 quatoro
+o_kura_ls = ('pmc=17008002', 2590, 'o_kura')
+ktakaoka_ls = ('pmc=21018018', 4000, 'ktakaoka')
+taiyo_ls = ('pmc=18001006', 280, 'taiyo')
+lapark_ls = ('pmc=21018015', 3240, 'lapark')
+kakeo_ls = ('pmc=16006037', 324, 'kakeo')
+himi_ls = ('pmc=16006008',  225, 'himi')
+yosi_ls = ('pmc=16006002', 192, 'yosi')
+tonanor_ls = ('pmc=16006020', 156, 'tonanor')
+tonasupa_ls = ('pmc=26036006', 212, 'tonasupa')
+quatoro_ls = ('pmc=18007010', 288, 'quatoro')
 
 
 
@@ -80,113 +86,44 @@ comp = dfm.drop(columns = ['base64','eigenvalue'])
 #hollname_list
 hollname_list = comp['hollcode'].drop_duplicates().tolist()
 
-
-#2/1quatoro daicount judge tonanor156 2/2 la328+2 ktaka 399+1 o-kura 259+44
-#dailist series to df
-#len(df)q=282
-'''
-def holl_judge(c):
-	if len(c) == 200:
-		return "inter"
-	elif len(c) == 259:
-		return "o-kura"
-	elif len(c) == 399:
-		return "ktakaoka"
-	elif len(c) == 280:
-		return "taiyotakaoka"
-	elif len(c) == 328:
-		return "lapark"
-	elif len(c) == 324:
-		return "kakeo"
-	elif len(c) == 225:
-		return "himi"
-	elif len(c) == 192:
-		return "yosi"
-	elif len(c) == 156:
-		return "tonanor"
-	elif len(c) == 212:
-		return "tonasupa"
-	elif len(c) == 297:
-		return "quatoro"
-'''
-'''
-if  len(comp) == 282: #Q
-	list_df = pd.read_csv('./dailist/quatorodailist.csv',names=('dai','hoge'))
-	merged_df = pd.merge(comp,list_df, on='dai' ,how='outer').drop( columns = 'hoge')
-	fillnaed_df = merged_df.fillna(0)
-	int_df = fillnaed_df.astype({'dai': 'int64','Rotation':'int64','BB':'int64','RB':'int64','difference':'int64','max':'int64','model':'str'})
-	comp = int_df.drop_duplicates(subset=['dai']).sort_values('dai')
-
-
-elif len(comp) == 156: #tonanor
-	print("tonanor_ok")
-elif len(comp) == 328: #la
-	posdai = comp.loc[:,'dai'].unique()
-	comp.insert(0,'posdai',posdai)
-	dailist = pd.read_csv('./dailist/laparkdailist.csv',names=('posdai','kuu'))
-	comp = pd.merge(comp, dailist, how='outer')
-	comp = comp.reindex(columns=['posdai','Rotation','BB','RB','difference','max','model'])
-	comp = comp.fillna(0)
-	comp = comp.astype({'posdai': 'int64','Rotation':'int64','BB':'int64','RB':'int64','difference':'int64','max':'int64','model':'str'})
-	comp = comp.sort_values('posdai')
-	print("la_2daiplus")
-elif len(comp) == 399: #ktaka
-	posdai = comp.loc[:,'dai'].unique()
-	comp.insert(0,'posdai',posdai)
-	dailist = pd.read_csv('./dailist/ktakaokadailist.csv',names=('posdai','kuu'))
-	comp = pd.merge(comp, dailist, how='outer')
-	comp = comp.reindex(columns=['posdai','Rotation','BB','RB','difference','max','model'])
-	comp = comp.fillna(0)
-	comp = comp.astype({'posdai': 'int64','Rotation':'int64','BB':'int64','RB':'int64','difference':'int64','max':'int64','model':'str'})
-	comp = comp.sort_values('posdai')
-	print("ktaka_1daiplus")
-elif len(comp) == 259: #o-kura
-	posdai = comp.loc[:,'dai'].unique()
-	comp.insert(0,'posdai',posdai)
-	dailist = pd.read_csv('./dailist/o-kuradailist.csv',names=('posdai','kuu'))
-	comp = pd.merge(comp, dailist, how='outer')
-	comp = comp.reindex(columns=['posdai','Rotation','BB','RB','difference','max','model'])
-	comp = comp.fillna(0)
-	comp = comp.astype({'posdai': 'int64','Rotation':'int64','BB':'int64','RB':'int64','difference':'int64','max':'int64','model':'str'})
-	comp = comp.sort_values('posdai')
-	print("o-ku_44daiplus")
-else:
-	print("no missing dai")
-
-#1/30auto seriesmodel bank
-#pd.Series.unique()
-#defdai = comp.loc[:,'model'].unique()
-
-#series to df
-#defdaidf = pd.DataFrame(defdai)
-#defdaidf.insert(0,'namebank', defdai)
-#dainame = pd.read_csv('namebank.csv',names=('namebank','neoname'))
-#drop_duplicates(subset=['namebank']
-#dainame = dainame.drop_duplicates(subset=['namebank'])
-#newdailist = pd.merge(defdaidf, dainame, how='outer')
-#newdailist = newdailist.reindex(columns=['namebank','neoname'])
-#newdailist.to_csv('./namebank.csv', header=False, index=False)
-'''
-
-
+#4.9
 #auto model_name_bank
-model_name_df = pd.DataFrame(comp['model'].drop_duplicates())
-model_name_df['fuga'] = '0'
-rename_list_df = pd.read_csv('namebank.csv',names=('model','renamed_model_name'))
-merged_model_name_df = pd.merge(model_name_df, rename_list_df , how='outer').drop(columns='fuga')
-sorted_model_df = merged_model_name_df.sort_values('renamed_model_name', na_position='first')
-sorted_model_df.to_csv('./namebank.csv', header=False, index=False)
-empty_value = (sorted_model_df['renamed_model_name'].isnull())
-'''
-if empty_value.sum() > 0 :
-	print("new model arrive")
-	print("open namebank.txt. register the update name")
-	print("Please re-execute after registration")
-	csv_stdout(sorted_model_df)
-	quit()
-else:
-	print("all model name has arrived")
-'''
+today_df = pd.DataFrame(comp['model'].drop_duplicates())
+today_df['fuga'] = '0'
+stock_df = pd.read_csv('namebank.csv',names=('model','renamed_model_name'))
+today_merged = pd.merge(today_df, stock_df  , how='outer').drop(columns='fuga')
+na_posi_df  =  today_merged.sort_values('renamed_model_name', na_position='first')
+empty_value_bool = (na_posi_df['renamed_model_name'].isnull())
+new_model_list = (na_posi_df['model'])[empty_value_bool].tolist()
+
+#4.9
+#empty judgment
+if len(new_model_list)!=0:
+	print("new_machine_arrive!")
+
+	renamed_new_model_list = []
+	for new_model in new_model_list:
+		print (new_model)
+		newshortname = input("new_machine_name_input ( q = quit ):")
+		if newshortname == "q" :
+			print("Finish!")
+			quit()
+			brake
+		else:
+			print(newshortname)
+			renamed_new_model_list.append(newshortname)
+	zippedlist =  list(zip(new_model_list, renamed_new_model_list))
+	print(zippedlist)
+	df_by_list = pd.DataFrame(zippedlist, columns = ['model', 'renamed_model_name'])
+	added_sorted_model_df = pd.merge(na_posi_df, df_by_list, on=('model', 'renamed_model_name'), how = 'outer').drop_duplicates(subset='model', keep='last')
+	sorted_model_df = added_sorted_model_df.sort_values('renamed_model_name', na_position='first')
+	sorted_model_df.to_csv('./namebank.csv', header=False, index=False)
+
+
+time.sleep(1)
+
+
+"""
 if empty_value.sum() > 0 :
 	csv_stdout(sorted_model_df)
 	new_model_list = (sorted_model_df['model'])[empty_value].tolist()
@@ -221,7 +158,7 @@ else:
 	pass
 print("all model name has arrived")
 sorted_model_df.to_csv('./namebank.csv', header=False, index=False)
-
+"""
 
 #rename
 dailist_df=  pd.read_csv('namebank.csv', header=None)
@@ -246,52 +183,78 @@ comp['date'] = intdt
 
 
 #hollname sequence
-'''
-print(comp)
-inter = (comp[comp['hollcode'] == 'pmc=26036001']).sort_values('dai')
 
-if  len(inter) == 200: #inter
-	inter_st = inter.drop(columns=['hollcode'])
-	inter_st.to_csv(f'/Users/mac2018/Applications/Collection/linkdata/inter.csv', header=False, index=False)
-else:
-	inter.insert(0,'dai_num_check',inter.loc[:,'dai'])
-	dai_num_check_df = pd.read_csv('./dailist/interdailist.csv',names=('dai_num_check','empty'),dtype="int64")
-	inter_outer_merged_df = pd.merge(inter, dai_num_check_df, how='outer')
-	inter_inner_merged_df = pd.merge(inter_outer_merged_df, dai_num_check_df, how='inner')
-	inter_inner_merged_df = inter_inner_merged_df.drop(columns=['hollcode','dai_num_check','empty'])
-	fillnaed_df = inter_inner_merged_df.fillna(0)
-	int_df = fillnaed_df.astype({'dai': 'int64','Rotation':'int64','BB':'int64','RB':'int64','difference':'int64','max':'int64','model':'str','date':'int64'})
-	inter_re = int_df.drop_duplicates(subset=['dai']).sort_values('dai')
-	inter_re.to_csv(f'/Users/mac2018/Applications/Collection/linkdata/inter.csv', header=False, index=False)
-'''
 def test(str1, int, str2):
 	test_df =  (comp[comp['hollcode'] == str1]).sort_values('dai')
 	if  len(test_df) == int:
 		test_df_st = test_df.drop(columns=['hollcode'])
 		test_df_st.to_csv(f'/Users/mac2018/Applications/Collection/linkdata/{str2}.csv', header=False, index=False)
 	else:
-		test_df.insert(0,'dai_num_check',inter.loc[:,'dai']) 
-		dai_num_check_df = pd.read_csv(f'./dailist/{str2}dailist.csv',names=('dai_num_check','empty'),dtype="int64")
-		outer_merged_df = pd.merge(test_df, dai_num_check_df, how='outer')
-		merged_df = pd.merge(outer_merged_df, dai_num_check_df, how='inner')
-		droped_df = merged_df.drop(columns=['hollcode','dai_num_check','empty'])
+		test_df.insert(0,'dai_num_check',test_df.loc[:,'dai']) 
+		dai_num_check_df = pd.read_csv(f'./dailist/{str2}dailist.csv',names=('dai_num_check','empty'),dtype='int64')
+		merged_df = pd.merge(test_df, dai_num_check_df, how='outer')
+		droped_df = merged_df.drop(columns=['hollcode','dai','empty'])
+		droped_df['date'] = droped_df['date'].fillna(method='ffill')
+		droped_df['model'] = droped_df['model'].fillna('空台')
 		fillnaed_df = droped_df.fillna(0)
-		int_df = fillnaed_df.astype({'dai': 'int64','Rotation':'int64','BB':'int64','RB':'int64','difference':'int64','max':'int64','model':'str','date':'int64'})
-		test_df_re = int_df.drop_duplicates(subset=['dai']).sort_values('dai')
+		int_df = fillnaed_df.astype({'dai_num_check': 'int64','Rotation':'int64','BB':'int64','RB':'int64','difference':'int64','max':'int64','model':'str','date':'int64'})
+		test_df_re = int_df.drop_duplicates(subset=['dai_num_check']).sort_values('dai_num_check')
 		test_df_re.to_csv(f'/Users/mac2018/Applications/Collection/linkdata/{str2}.csv', header=False, index=False)
 
 #loop hollname_list
 for holl in hollname_list :
 	if holl == 'pmc=26036001':
 		test(*inter_ls)
+		print('inter')
 	elif holl == 'pmc=17008002':
 		test(*o_kura_ls)
+		print('o_kura')
+	elif holl == 'pmc=21018018':
+		test(*ktakaoka_ls)
+		print('ktakaoka')
+	elif holl == 'pmc=18001006':
+		test(*taiyo_ls)
+		print('taiyo')
+	elif holl == 'pmc=21018015':
+		test(*lapark_ls)
+		print('lapark')
+	elif holl == 'pmc=16006037':
+		test(*kakeo_ls)
+		print('kakeo')
+	elif holl == 'pmc=16006008':
+		test(*himi_ls)
+		print('himi')
+	elif holl == 'pmc=16006002':
+		test(*yosi_ls)
+		print('yosi')
+	elif holl == 'pmc=16006020':
+		test(*tonanor_ls)
+		print('tonanor')
+	elif holl == 'pmc=26036006':
+		test(*tonasupa_ls)
+		print('tonasupa')
+	elif holl == 'pmc=18007010':
+		test(*quatoro_ls)
+		print('quatoro')
 	else:
 		pass
 
 #*tuple open
 #test(*inter_ls)
 #test(*o_kura_ls)
+#test(*ktakaoka_ls)
+#test(*taiyo_ls)
+#test(*lapark_ls)
+#test(*kakeo_ls)
+#test(*himi_ls)
+#test(*yosi_ls)
+#test(*tonanor_ls)
+#test(*tonasupa_ls)
+#test(*quatoro_ls)
+
+#str1 = 'pmc=21018015'
+#int = 3240
+#str2 = 'lapark'
 
 
 
