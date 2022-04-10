@@ -183,15 +183,15 @@ comp['date'] = intdt
 
 
 #namebank.csvの撤去台情報を削除する
-#名前追加時のif文で分岐とする
+
 #dailist_dfはカラム名をつけて使い回し
 #最新台番はmain_dfからハードコピー
 #現在の台用のファイルが必要tmp_dai.txt
 #tmp_dai.txtを出力後同じdfでdailist_dfとインナーマージ
 #初回は貯まるまで最終マージできない
-#重複削除後merge
-#if len(new_model_list)!=0:
-#テスト中　　　!=0:
+
+
+#名前追加時のif文で分岐とする
 if len(new_model_list)!=0:
 	tmp_dai = pd.read_csv('tmp_dai.txt', names=('model', 'day'))
 	today_df = main_df.iloc[:,7:9].copy()
