@@ -118,7 +118,7 @@ if len(new_model_list)!=0:
 	added_sorted_model_df = pd.merge(na_posi_df, df_by_list, on=('model', 'renamed_model_name'), how = 'outer').drop_duplicates(subset='model', keep='last')
 	sorted_model_df = added_sorted_model_df.sort_values('renamed_model_name', na_position='first')
 	sorted_model_df.to_csv('./namebank.csv', header=False, index=False)
-
+	print("New_machine_names_addition completed")
 
 time.sleep(1)
 
@@ -161,7 +161,7 @@ sorted_model_df.to_csv('./namebank.csv', header=False, index=False)
 """
 
 #rename
-dailist_df=  pd.read_csv('namebank.csv', header=None)
+dailist_df=  pd.read_csv('namebank.csv', header=None, names=('model','shortnames'))
 longname_list = (dailist_df.iloc[:,0]).values.tolist()
 shortname_list = (dailist_df.iloc[:,1]).values.tolist()
 comp = comp.replace(longname_list,shortname_list)
@@ -180,6 +180,33 @@ if __name__ == '__main__':
 intdt= int(d.strftime('%Y%m%d'))
 print(intdt)
 comp['date'] = intdt
+
+
+#namebank.csvの撤去台情報を削除する
+#名前追加時のif文で分岐とする
+#dailist_dfはカラム名をつけて使い回し
+#最新台番はmain_dfからハードコピー
+#現在の台用のファイルが必要tmp_dai.txt
+#tmp_dai.txtを出力後同じdfでdailist_dfとインナーマージ
+#初回は貯まるまで最終マージできない
+#重複削除後merge
+#if len(new_model_list)!=0:
+#テスト中　　　!=0:
+if len(new_model_list)!=0:
+	tmp_dai = pd.read_csv('tmp_dai.txt', names=('model', 'day'))
+	today_df = main_df.iloc[:,7:9].copy()
+	dup_today_df = today_df.drop_duplicates(subset='model', keep='last').copy()
+	dup_today_df['day'] = intdt
+	drop_today_df = dup_today_df.drop(columns='hollcode')
+	new_tmp_dai = pd.merge(drop_today_df, tmp_dai, how = 'outer', on ='model').drop(columns='day_x')
+	sorted_new_tmp_dai = new_tmp_dai.sort_values('model', na_position='first')
+	dropna_new_tmp_dai = sorted_new_tmp_dai.dropna(subset=['model'], axis=0)
+	dup_new_tmp_dai = dropna_new_tmp_dai.drop_duplicates(subset='model')
+	dup_new_tmp_dai.to_csv('./tmp_dai.txt', header=False, index=False)
+	inner_name_df = pd.merge(dup_new_tmp_dai, dailist_df, how = 'inner', on ='model').drop(columns='day_y')
+	droped_inner_df = inner_name_df.sort_values('model', na_position='first').dropna(subset=['model'], axis=0)
+	droped_inner_df.to_csv('./namebank.csv', header=False, index=False)
+
 
 
 #hollname sequence
