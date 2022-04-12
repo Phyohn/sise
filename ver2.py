@@ -100,7 +100,9 @@ new_model_list = (na_posi_df['model'])[empty_value_bool].tolist()
 #empty judgment
 if len(new_model_list)!=0:
 	print("new_machine_arrive!")
-
+	print(new_model_list)
+	print("")
+	print("")
 	renamed_new_model_list = []
 	for new_model in new_model_list:
 		print (new_model)
@@ -193,21 +195,23 @@ comp['date'] = intdt
 
 #名前追加時のif文で分岐とする
 if len(new_model_list)!=0:
-	tmp_dai = pd.read_csv('tmp_dai.txt', names=('model', 'day'))
+	tmp_dai = pd.read_csv('tmp_dai.txt', names=('model', '~~','day'),dtype='str')
+	tmp_dai['day'] = str(intdt)
 	today_df = main_df.iloc[:,7:9].copy()
 	dup_today_df = today_df.drop_duplicates(subset='model', keep='last').copy()
-	dup_today_df['day'] = intdt
 	drop_today_df = dup_today_df.drop(columns='hollcode')
-	new_tmp_dai = pd.merge(drop_today_df, tmp_dai, how = 'outer', on ='model').drop(columns='day_x')
+	new_tmp_dai = pd.merge(drop_today_df, tmp_dai, how = 'outer', on ='model')
 	sorted_new_tmp_dai = new_tmp_dai.sort_values('model', na_position='first')
 	dropna_new_tmp_dai = sorted_new_tmp_dai.dropna(subset=['model'], axis=0)
 	dup_new_tmp_dai = dropna_new_tmp_dai.drop_duplicates(subset='model')
+	dup_new_tmp_dai['~~'] = dup_new_tmp_dai['~~'].fillna('~~~~~~~~~~~~~~~~~~~~~~~')
+	dup_new_tmp_dai['day'] = dup_new_tmp_dai['day'].fillna(f'~~~~~~~~~~~~~~~~~~~~~~~{intdt}新台')
 	dup_new_tmp_dai.to_csv('./tmp_dai.txt', header=False, index=False)
-	inner_name_df = pd.merge(dup_new_tmp_dai, dailist_df, how = 'inner', on ='model').drop(columns='day_y')
+	inner_name_df = pd.merge(dup_new_tmp_dai, dailist_df, how = 'inner', on ='model').drop(columns= ['~~','day'])
 	droped_inner_df = inner_name_df.sort_values('model', na_position='first').dropna(subset=['model'], axis=0)
 	droped_inner_df.to_csv('./namebank.csv', header=False, index=False)
 
-
+#.drop(columns='day_x')
 
 #hollname sequence
 
